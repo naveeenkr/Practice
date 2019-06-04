@@ -1,0 +1,55 @@
+//https://www.hackerrank.com/contests/gs-codesprint/challenges/buy-maximum-stocks/copy-from/1314543858
+
+//Author: Naveen Singh
+
+import java.util.*;
+import java.math.*;
+class Stock{
+    private final int iprice;
+    private final int iday;
+    
+    public Stock(int price, int day){
+        iprice = price;
+        iday = day;
+    }
+    public int price(){return iprice;}
+    public int day(){return iday;}
+}
+public class Solution {
+    static long buyMaximumProducts(int n, long k, ArrayList a) {
+        Collections.sort(a, new Comparator(){
+            public int compare(Object o1, Object o2){
+                Integer x1 = ((Stock) o1).price();
+                Integer x2 = ((Stock) o2).price();
+                int sComp = x1.compareTo(x2);
+                if(sComp != 0) return sComp;
+                
+                x1 = ((Stock) o1).day();
+                x2 = ((Stock) o2).day();
+                return x1.compareTo(x2);
+            }
+        });
+        
+        long total_purchase = 0;
+        for(int i=0;i<n;i++){
+            Stock s = (Stock)a.get(i);
+            long purchase = Math.min(s.day(), (long)k/s.price());
+            total_purchase += purchase;
+            k -= purchase * s.price();
+        }
+        return total_purchase;
+    }
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int n = in.nextInt();
+        ArrayList<Stock> arr = new ArrayList<Stock>();
+        
+        for(int arr_i = 0; arr_i < n; arr_i++){
+            arr.add(new Stock(in.nextInt(), arr_i+1));
+        }
+        long k = in.nextLong();
+        long result = buyMaximumProducts(n, k, arr);
+        System.out.println(result);
+        in.close();
+    }
+}
