@@ -1,0 +1,41 @@
+// https://www.hackerrank.com/contests/gs-codesprint/challenges/trader-profit
+// Author: Naveen Singh
+
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    static int traderProfit(int k, int n, int[] a) {
+        int profit[][] = new int[k+1][n+1];
+        for(int t=1;t<=k;t++){
+            for(int i=1;i<=n;i++){
+                int max = 0;
+                for(int j=0;j<i;j++){
+                    max = Math.max(max, (a[i] - a[j] + profit[t-1][j]));
+                }
+                profit[t][i] = Math.max(max, profit[t][i-1]);
+            }
+        }
+        return profit[k][n-1];
+    }
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int q = in.nextInt();
+        for(int a0 = 0; a0 < q; a0++){
+            int k = in.nextInt();
+            int n = in.nextInt();
+            int[] arr = new int[n+1];
+            for(int arr_i = 0; arr_i < n; arr_i++){
+                arr[arr_i] = in.nextInt();
+            }
+            int result = traderProfit(k, n, arr);
+            System.out.println(result);
+        }
+        in.close();
+    }
+}
