@@ -1,0 +1,58 @@
+import java.io.*;
+import java.util.*;
+
+class BinarySearchTree { 
+
+	class Node { 
+		int key; 
+		Node left, right; 
+
+		public Node(int item) { 
+			key = item; 
+			left = right = null; 
+		} 
+	} 
+
+	Node root; 
+
+	BinarySearchTree() { 
+		root = null; 
+	} 
+
+	void insert(int key) { 
+	int smaller[] = {-1}, greater[] = {-1};
+	root = insertRec(root, key, smaller, greater);
+	System.out.println(smaller[0] + " " + greater[0]);
+	} 
+
+	Node insertRec(Node root, int key, int[] smaller, int[] greater) { 
+		if (root == null) { 
+			root = new Node(key); 
+			return root; 
+		} 
+
+		if (key < root.key) {
+		    greater[0] = root.key;
+			root.left = insertRec(root.left, key, smaller, greater); 
+		}
+		else if (key > root.key) {
+			smaller[0] = root.key;
+			root.right = insertRec(root.right, key, smaller, greater); 
+		}
+
+		return root; 
+	} 
+
+
+	public static void main(String[] args) { 
+		BinarySearchTree tree = new BinarySearchTree(); 
+
+		Scanner in = new Scanner(System.in);
+		int N = in.nextInt();
+        
+        for(int i=0;i<N;i++){
+            tree.insert(in.nextInt());
+        }
+	} 
+} 
+
