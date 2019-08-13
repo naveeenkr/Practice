@@ -1,0 +1,143 @@
+/*
+    Author: Naveen Singh
+    Email : singh.naveen46@gmail.com
+*/
+
+#include <iostream>
+#include<list>
+#include<vector>
+#include<queue>
+
+class Edge;
+
+class Node{
+    int id;
+    bool visited;
+    int dist;
+    std::list<Edge*> outEdges;
+    public:
+        Node(int id){
+            this->id = id;
+            this->visited = false;
+        }
+        void addEdge(Edge* e){
+            this->outEdges.push_back(e);
+        }
+        
+        std::list<Edge*> getOutEdges(){
+            return this->outEdges;
+        }
+        int getID() const { return this->id; }
+        void setID() { this->id = -1 * this->id; }
+        bool getVisited() const { return this->visited; }
+        void setVisited() { this->visited = true; }
+        
+        void _init_ID(){
+            if(this->id < 0) this->id = -1 * this->id;
+        }
+        void _init_visited(){
+            visited = false;
+        }
+
+};
+
+class Edge{
+    int cost;
+    Node* src;
+    Node* dest;
+    public:
+        Edge(int cost, Node* src, Node* dest) {
+            this->cost = cost;
+            this->src = src;
+            this->dest = dest;
+        }
+        double getCost() const{
+            return this->cost;
+        }
+        Node* getDest() const{
+            return this->dest;
+        }
+};
+
+class Graph{
+    int V;
+    std::vector<Node*> vertex;
+    public:
+        Graph(int v){
+            this->V = v;
+            vertex.push_back(0);
+            for(int i=1;i<V;i++){
+                Node *new_node = new Node(i);
+                this->vertex.push_back(new_node);
+            }
+        }
+        Node* getNode(int i) const{
+            return vertex[i];
+        }
+        void _init_Node(){
+            for(int i=1;i<V;i++){
+                getNode(i)->_init_ID();
+                getNode(i)->_init_visited();
+            }
+        }
+        void BFS(Node* s);
+};
+
+
+void Graph::BFS(Node* s){
+    std::queue<Node*> q;
+    q.push(s);
+    s->setVisited();
+    
+    while(!q.empty()){
+        Node* u = q.front(); q.pop();
+        std::cout<<u->getID()<<" ";
+        std::list<Edge*> outedges = u->getOutEdges();
+        for(auto x: outedges){
+            Node* next = x->getDest();
+            if(!next->getVisited()){
+                next->setVisited();
+                q.push(next);
+            }
+        }
+    }
+    
+}
+
+int main()
+{
+    int V, E;
+    std::cin>>V>>E;
+    Graph g(V+1);
+    
+    for(int i=0;i<E;i++){
+        int u, v; double c;
+        std::cin>>u>>v>>c;
+        Node *s= g.getNode(u);
+        Node *e = g.getNode(v);
+        Edge *new_edge = new Edge(c, s, e);
+        s->addEdge(new_edge);
+    }
+
+    std::cout<<"BFS from Node 1:\n";
+    g.BFS(g.getNode(1));
+
+    return 0;
+}
+  /*
+      I/P:
+      10
+      11
+      1 2 100
+      2 3 1
+      3 4 1
+      4 1 1
+      1 5 1
+      5 6 1
+      6 7 1
+      7 7 1
+      7 8 1
+      8 9 1
+      9 10 1  
+      
+  */
