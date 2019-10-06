@@ -1,0 +1,128 @@
+#include <iostream>
+#include<algorithm>
+using namespace std;
+
+#define size 128
+
+class TrieNode{
+    TrieNode *children[size];
+    bool isWord;
+    
+    public:
+        TrieNode(){
+            this->isWord = false;
+            for(int i=0;i<size;i++)
+                this->children[i] = nullptr;
+        }
+        
+        void insert(string);
+        bool search(string);
+        int prefix(string);
+        void isConcatable(TrieNode*, string, const string);
+        void autoComplete(TrieNode*, const string);
+        void DFSAutoComplete(TrieNode*, string);
+        
+};
+
+//Insert word into a trie.
+void TrieNode::insert(string word){
+    TrieNode *root = this;
+    for(int i=0;i<word.length();i++){
+        if(root->children[word[i]] == nullptr)
+            root->children[word[i]] = new TrieNode();
+        root = root->children[word[i]];
+    }
+    root->isWord = true;
+}
+
+//Search for word
+bool TrieNode::search(string word){
+    TrieNode *temp = this;
+    for(int i=0;i<word.length();i++){
+        if(temp->children[word[i]] != nullptr)
+            temp = temp->children[word[i]];
+        else return false;
+    }
+    return temp->isWord;
+}
+
+//Search for word and return maximum matched characters from word.
+int TrieNode::prefix(string word){
+    TrieNode *temp = this;
+    for(int i=0;i<word.length();i++){
+        if(temp->isWord)
+            return i;
+        if(temp->children[word[i]] != nullptr)
+            temp = temp->children[word[i]];
+        else
+            return -1;
+    }
+    return word.length();
+}
+
+//check if a word can be represented by concatenation of different words from same dictionary.
+void TrieNode::isConcatable(TrieNode *m_root, string sub_word, const string word){
+    TrieNode *root = m_root;
+    if(sub_word == "") return;
+    static int start = 0;
+    //cout<<"word: "<<sub_word<<endl;
+    int partial_word = root->prefix(sub_word);
+    //cout<<partial_word<<endl;
+    if(partial_word == -1) {
+        cout<<"\nword can't be formed";
+        return;
+    }
+    cout<<word.substr(start, partial_word)<<", ";
+    start += partial_word;
+    //cout<<word.substr(partial_word, word.length()-partial_word);
+    isConcatable(root, word.substr(start, word.length()-start), word);
+}
+
+//Print auto complete suggestions for a given string from dictionary.
+void TrieNode::autoComplete(TrieNode* root, const string word){
+    TrieNode *temp = root;
+    int len = word.length();
+    string prefix;
+    for(int i=0;i<len;i++){
+        if(temp->children[word[i]] != nullptr){
+            temp = temp->children[word[i]];
+            prefix += word[i];
+            }
+        else return;
+    }
+    cout<<prefix<<endl;
+    DFSAutoComplete(temp, prefix);
+}
+
+//Util function for auto complete to run DFS on trie.
+void TrieNode::DFSAutoComplete(TrieNode *temp, string prefix){
+    for(int i=97;i<123;i++){
+        if(temp->children[i] ){
+            //cout<<(char)i;
+            prefix += (char)i;
+            if(temp->children[i]->isWord){
+                cout<<prefix<<endl;
+            }
+            DFSAutoComplete(temp->children[i], prefix);
+            prefix = prefix.substr(0, prefix.length()-1);
+        }
+    }
+}
+
+int main()
+{
+    TrieNode *root = new TrieNode();
+    string dictionary[] = { "rock", "rocks", "rockstar", "rockstarer", "rocz", "star", "tar", 
+                             "ind", "india", "ia", "er" };
+    for(int i=0;i<11;i++){
+        root->insert(dictionary[i]);
+        }
+    
+    
+    //cout<<root->search("ia");
+    
+    //root->isConcatable(root, "rockstarer", "rockstarer");
+    
+    root->autoComplete(root, "roc");
+    return 0;
+}
