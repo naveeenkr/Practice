@@ -1,3 +1,8 @@
+/*
+    Author: Naveen Singh
+    Email : singh.naveen46@gmail.com
+*/
+
 #include <iostream>
 #include<algorithm>
 using namespace std;
