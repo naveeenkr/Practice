@@ -1,0 +1,170 @@
+/*
+    Author: Naveen Singh
+    Email : singh.naveen46@gmail.com
+*/
+
+#include <iostream>
+#include<algorithm>
+using namespace std;
+
+#define size 128
+
+class TrieNode{
+    TrieNode *children[size];
+    bool isWord;
+    
+    public:
+        TrieNode(){
+            this->isWord = false;
+            for(int i=0;i<size;i++)
+                this->children[i] = nullptr;
+        }
+        
+        void insert(string);
+        bool search(string);
+        int prefix(TrieNode*, string);
+        void isConcatable(TrieNode*, string, const string, int);
+        void autoComplete(TrieNode*, const string);
+        void DFSAutoComplete(TrieNode*, string);
+        bool wordBreak(TrieNode*, string);
+        void wordBreakAll(TrieNode*, string, int, string);
+        
+};
+
+void TrieNode::insert(string word){
+    TrieNode *root = this;
+    for(int i=0;i<word.length();i++){
+        if(root->children[word[i]] == nullptr)
+            root->children[word[i]] = new TrieNode();
+        root = root->children[word[i]];
+    }
+    root->isWord = true;
+}
+
+
+bool TrieNode::search(string word){
+    TrieNode *temp = this;
+    for(int i=0;i<word.length();i++){
+        if(temp->children[word[i]] != nullptr)
+            temp = temp->children[word[i]];
+        else return false;
+    }
+    return temp->isWord && temp;
+}
+
+int TrieNode::prefix(TrieNode *root, string word){
+    TrieNode *temp = root;
+    for(int i=0;i<word.length();i++){
+        if(temp->isWord)
+            return i;
+        if(temp->children[word[i]] != nullptr)
+            temp = temp->children[word[i]];
+        else
+            return -1;
+    }
+    return word.length();
+}
+
+void TrieNode::isConcatable(TrieNode *m_root, string sub_word, const string word, int start){
+    TrieNode *root = m_root;
+    if(sub_word == "") return;
+    //static int start = 0;
+    cout<<"word: "<<sub_word<<endl;
+    int partial_word = root->prefix(root, sub_word);
+    //cout<<partial_word<<endl;
+    if(partial_word == -1) {
+        cout<<"word can't be formed\n";
+        return;
+    }
+    cout<<word.substr(start, partial_word)<<", ";
+    start += partial_word;
+    //cout<<word.substr(partial_word, word.length()-partial_word);
+    isConcatable(root, word.substr(start, word.length()-start), word, start);
+}
+
+void TrieNode::autoComplete(TrieNode* root, const string word){
+    TrieNode *temp = root;
+    int len = word.length();
+    string prefix;
+    for(int i=0;i<len;i++){
+        if(temp->children[word[i]] != nullptr){
+            temp = temp->children[word[i]];
+            prefix += word[i];
+            }
+        else return;
+    }
+    cout<<prefix<<endl;
+    DFSAutoComplete(root, prefix);
+}
+
+void TrieNode::DFSAutoComplete(TrieNode *root, string prefix){
+    TrieNode* temp = root;
+    for(int i=97;i<123;i++){
+        if(temp->children[i] ){
+            //cout<<(char)i;
+            prefix += (char)i;
+            if(temp->children[i]->isWord){
+                cout<<prefix<<": ";
+                //temp->isConcatable(root, prefix, prefix, 0);
+            }
+            DFSAutoComplete(temp->children[i], prefix);
+            prefix = prefix.substr(0, prefix.length()-1);
+        }
+    }
+}
+
+bool TrieNode::wordBreak(TrieNode *root, string word){
+    int len = word.length();
+    if(0 == len) return true;
+    
+    for(int i = 0;i<size;i++){
+        if(root->search(word.substr(0, i))){
+            cout<<word.substr(0, i) <<" ";
+        }
+        if(root->search(word.substr(0, i)) && root->wordBreak(root, word.substr(i, len-i))){
+        return true;
+        }
+    }
+    return false;
+}
+
+void TrieNode::wordBreakAll(TrieNode *root, string word, int n, string result){
+    for(int i = 1;i<=n;i++){
+        string prefix = word.substr(0, i);
+        if(root->search(prefix)){
+            if(i == n){
+                result += prefix;
+                //if(result == word) return;
+                cout<<"\t"<<result<<endl;
+                return;
+            }
+            wordBreakAll(root, word.substr(i, n-i), n-i, result + prefix + " ");
+        }
+    }
+}
+
+int main()
+{
+    TrieNode *root = new TrieNode();
+    string dictionary2[] = { "rock", "rocks", "rockstar", "rockstarer", "rocz", "star", "tar", 
+                             "ind", "india", "ia", "er" };
+    string dictionary[] = { "i", "like", "sam", "sung", "samsung", "mobile", "ice", 
+  "cream", "icecream", "man", "go", "mango", "ilikesamsungicecream" };
+    for(int i=0;i<13;i++){
+        root->insert(dictionary[i]);
+        }
+    
+    
+    //cout<<root->search("ia");
+    
+    //root->isConcatable(root, "rockstarer", "rockstarer", 0);
+    //cout<<root->wordBreak(root, "rockstarer");
+    //root->autoComplete(root, "");
+    
+    for(int i=0;i<13;i++){
+        cout<<dictionary[i]<<": \n";
+        root->wordBreakAll(root, dictionary[i], dictionary[i].length(), "");
+        }
+    
+    return 0;
+}
