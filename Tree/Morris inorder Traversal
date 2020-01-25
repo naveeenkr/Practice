@@ -1,0 +1,89 @@
+/*
+	Author: Naveen Singh
+		
+	This program traverses a tree without using recursion or any extra space.
+  It also prints sum of all nodes in a tree.
+*/
+
+#include <iostream>
+
+using namespace std;
+
+class Node{
+    public:
+    int data;
+    Node* left;
+    Node* right;
+    Node(int data) : data(data), left(nullptr), right(nullptr) {}
+    Node* insert(Node*, int);
+    void inorder(Node*);
+    void inorder_no_Memory(Node*);
+    Node* inorder_predecessor(Node*, Node*);
+};
+
+
+Node* Node::insert(Node* root, int data){
+    if(!root){
+        Node* newNode = new Node(data);
+        root = newNode;
+        return root;
+    }
+    else{
+        if(data <= root->data){
+            root->left = insert(root->left, data);
+        } 
+        else{
+            root->right = insert(root->right, data);
+        }
+    }
+    return root;
+}
+
+Node* Node::inorder_predecessor(Node* root, Node* curr){
+    while(root->right!= nullptr && root->right != curr) root = root->right;
+    return root;
+}
+void Node::inorder(Node* root){
+    if(!root) return;
+    inorder(root->left);
+    cout<<root->data<<" ";
+    inorder(root->right);
+}
+
+void Node::inorder_no_Memory(Node* root){
+    Node* current = root;
+    static int sum = 0;
+    while(current != nullptr){
+        if(current->left == nullptr){
+            cout<<current->data<<" ";
+            sum += current->data;
+            current = current->right;
+        }
+        else{
+            Node* in_p = inorder_predecessor(current->left, current);
+            if(in_p->right == nullptr){
+                in_p->right = current;
+                current = current->left;
+            }
+            else{
+                in_p = nullptr;
+                cout<<current->data<<" ";
+                sum += current->data;
+                current = current->right;
+            }
+        }
+    }
+    cout<<endl<<sum;
+}
+
+int main()
+{
+    Node *root = new Node(10);
+    root->insert(root, 5);
+    root->insert(root, 7);
+    root->insert(root, 20);
+    
+    root->inorder_no_Memory(root);
+    return 0;
+}
+
