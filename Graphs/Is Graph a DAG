@@ -1,6 +1,10 @@
 /*
     Author: Naveen Singh
     Email : singh.naveen46@gmail.com
+    
+    This file demonstrates a node edge representation of a graph to store multiple data in a node and at an edge. Later it also 
+    builds an adjacency list representation of a graph using these nodes and edges. The main function creates a DAG and isDag 
+    tests whether this DAG contains cycle or not.
 */
 
 #include <iostream>
